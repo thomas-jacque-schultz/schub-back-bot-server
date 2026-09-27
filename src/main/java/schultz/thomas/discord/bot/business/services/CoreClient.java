@@ -50,25 +50,46 @@ public class CoreClient {
     }
 
     public void start(String slug, String actorDiscordId) {
+        String actorId = actorIdOf(actorDiscordId);
         restClient.post()
                 .uri("/game-servers/{slug}/start", slug)
-                .headers(headers -> withActor(headers, actorDiscordId))
+                .headers(headers -> withActor(headers, actorId))
                 .retrieve()
                 .toBodilessEntity();
     }
 
     public void stop(String slug, String actorDiscordId) {
+        String actorId = actorIdOf(actorDiscordId);
         restClient.post()
                 .uri("/game-servers/{slug}/stop", slug)
-                .headers(headers -> withActor(headers, actorDiscordId))
+                .headers(headers -> withActor(headers, actorId))
                 .retrieve()
                 .toBodilessEntity();
     }
 
-    private void withActor(org.springframework.http.HttpHeaders headers, String actorDiscordId) {
-        if (actorDiscordId != null && !actorDiscordId.isBlank()) {
-            headers.set(ACTOR_HEADER, actorDiscordId);
+    // Le cœur désigne l'acteur par son identifiant interne : le compte est retrouvé, ou créé, par son identifiant Discord.
+    private String actorIdOf(String discordId) {
+        if (discordId == null || discordId.isBlank()) {
+            return null;
         }
+        Identity identity = restClient.get()
+                .uri("/users/by-discord/{discordId}", discordId)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(Identity.class);
+        return identity == null || identity.user() == null ? null : identity.user().id();
+    }
+
+    private void withActor(org.springframework.http.HttpHeaders headers, String actorId) {
+        if (actorId != null && !actorId.isBlank()) {
+            headers.set(ACTOR_HEADER, actorId);
+        }
+    }
+
+    record Identity(Account user) {
+    }
+
+    record Account(String id) {
     }
 
 }
