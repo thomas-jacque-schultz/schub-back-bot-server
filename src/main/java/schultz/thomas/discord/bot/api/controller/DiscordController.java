@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import schultz.thomas.discord.bot.business.mapper.DiscordChannelMapper;
+import schultz.thomas.discord.bot.business.services.ChannelCleanupService;
 import schultz.thomas.discord.bot.business.services.DirectMessageService;
 import schultz.thomas.discord.bot.business.services.DiscordMessageService;
+import schultz.thomas.discord.bot.api.dto.ChannelCleanupDto;
 import schultz.thomas.discord.bot.api.dto.DirectMessageAck;
 import schultz.thomas.discord.bot.api.dto.DirectMessageRequest;
 import schultz.thomas.discord.bot.api.dto.DiscordChannelSubscriptionRequest;
@@ -31,6 +33,7 @@ public class DiscordController {
     private final DiscordMessageService discordMessageService;
     private final DiscordChannelMapper discordChannelMapper;
     private final DirectMessageService directMessageService;
+    private final ChannelCleanupService channelCleanupService;
 
     @GetMapping("/guilds/channels")
     public ResponseEntity<List<DiscordGuildChannelsDto>> getGuildsWithChannels() {
@@ -57,6 +60,16 @@ public class DiscordController {
 
         discordMessageService.subscribeAndRefresh(channels);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/channels/clean")
+    public List<ChannelCleanupDto> previewCleanup() {
+        return channelCleanupService.preview();
+    }
+
+    @PostMapping("/channels/clean")
+    public List<ChannelCleanupDto> cleanChannels() {
+        return channelCleanupService.clean();
     }
 
     @PostMapping("/direct-messages")
