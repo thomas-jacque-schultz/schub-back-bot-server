@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -199,6 +200,14 @@ public class DiscordMessageService {
 
         if(gamingServerEntity.getSlug() != null && !gamingServerEntity.getSlug().isEmpty()){
             embedBuilder.addField("Identifiant :", gamingServerEntity.getSlug(), false);
+        }
+
+        if (gamingServerEntity.getReferents() != null && !gamingServerEntity.getReferents().isEmpty()) {
+            embedBuilder.addField("Référents", gamingServerEntity.getReferents().stream()
+                    .map(referent -> referent.getDiscordId() != null
+                            ? "<@" + referent.getDiscordId() + ">"
+                            : referent.getDisplayName())
+                    .collect(Collectors.joining(" ")), false);
         }
 
         GameServerView.CommandFailure failure = gamingServerEntity.getLastCommandFailure();
