@@ -16,6 +16,13 @@ public class GameServerView {
     private String version;
     private String description;
     private String status;
+    private CommandFailure lastCommandFailure;
+
+    @Data
+    public static class CommandFailure {
+        private String action;
+        private String message;
+    }
 
     public boolean isOnline() {
         return "ONLINE".equals(status);
