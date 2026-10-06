@@ -48,6 +48,9 @@ public class StartServerGamingCommand implements Command {
         try {
             coreClient.start(slug, context.getOptions().get("user-id"));
         } catch (RuntimeException e) {
+            if (CoreClient.isNotReferent(e)) {
+                throw new CommandFailedException("Tu n'es pas référent de ce serveur");
+            }
             log.warn("Démarrage refusé par le cœur pour '{}' : {}", slug, e.getMessage());
             throw new CommandFailedException("Impossible de lancer le serveur de jeu");
         }

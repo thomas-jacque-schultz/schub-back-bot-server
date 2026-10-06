@@ -48,6 +48,9 @@ public class StopServerGamingCommand implements Command {
         try {
             coreClient.stop(slug, context.getOptions().get("user-id"));
         } catch (RuntimeException e) {
+            if (CoreClient.isNotReferent(e)) {
+                throw new CommandFailedException("Tu n'es pas référent de ce serveur");
+            }
             log.warn("Arrêt refusé par le cœur pour '{}' : {}", slug, e.getMessage());
             throw new CommandFailedException("Impossible d'arrêter le serveur de jeu");
         }

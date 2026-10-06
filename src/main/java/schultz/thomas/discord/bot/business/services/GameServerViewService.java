@@ -32,6 +32,10 @@ public class GameServerViewService {
         return view.get();
     }
 
+    public Optional<GameServerView> byId(String id) {
+        return view.get().stream().filter(server -> id.equals(server.getId())).findFirst();
+    }
+
     public Optional<GameServerView> bySlug(String slug) {
         return view.get().stream().filter(server -> slug.equals(server.getSlug())).findFirst();
     }

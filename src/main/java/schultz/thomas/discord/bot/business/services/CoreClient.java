@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
 import schultz.thomas.discord.bot.data.view.GameServerView;
@@ -65,6 +66,11 @@ public class CoreClient {
                 .headers(headers -> withActor(headers, actorId))
                 .retrieve()
                 .toBodilessEntity();
+    }
+
+    public static boolean isNotReferent(RuntimeException e) {
+        return e instanceof HttpClientErrorException.Forbidden forbidden
+                && forbidden.getResponseBodyAsString().contains("NOT_REFERENT");
     }
 
     // Le cœur désigne l'acteur par son identifiant interne : le compte est retrouvé, ou créé, par son identifiant Discord.
